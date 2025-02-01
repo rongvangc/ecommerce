@@ -1,4 +1,5 @@
-import { login } from "@lib/data/customer"
+import { login, loginWithGoogle } from "@lib/data/customer"
+import { Button } from "@medusajs/ui"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -11,6 +12,7 @@ type Props = {
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
+  const [googlemessage, googleAction] = useActionState(loginWithGoogle, null)
 
   return (
     <div
@@ -45,6 +47,15 @@ const Login = ({ setCurrentView }: Props) => {
         <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
           Sign in
         </SubmitButton>
+      </form>
+      <form action={googleAction}>
+        <Button
+          data-testid="google-sign-in-button"
+          className="w-full mt-6"
+          variant="secondary"
+        >
+          Login with Google
+        </Button>
       </form>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
         Not a member?{" "}

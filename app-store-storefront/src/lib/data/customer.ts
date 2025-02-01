@@ -13,6 +13,7 @@ import {
   removeAuthToken,
   setAuthToken,
 } from "./cookies"
+const BACKEND_URL = process.env.MEDUSA_BACKEND_URL
 
 export const retrieveCustomer =
   async (): Promise<HttpTypes.StoreCustomer | null> => {
@@ -244,4 +245,37 @@ export const updateCustomerAddress = async (
     .catch((err) => {
       return { success: false, error: err.toString() }
     })
+}
+
+export const loginWithGoogle = async () => {
+  const result = await fetch(`${BACKEND_URL}/auth/customer/google`, {
+    credentials: "include",
+    method: "POST",
+  }).then((res) => res.json())
+
+  console.log(result)
+
+  if (result.location) {
+    // redirect to Google for authentication
+    redirect(result.location)
+  }
+
+  if (!result.token) {
+    // result failed, show an error
+    console.log("Authentication failed")
+    return
+  }
+
+  // authentication successful
+  // use token in the authorization header of
+  // all follow up requests. For example:
+  const { customer } = await fetch(`http://localhost:9000/store/customers/me`, {
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${result.token}`,
+      "x-publishable-api-key":
+        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
+    },
+  }).then((res) => res.json())
 }
