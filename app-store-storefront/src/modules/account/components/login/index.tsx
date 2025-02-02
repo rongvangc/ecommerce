@@ -12,7 +12,7 @@ type Props = {
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
-  const [googlemessage, googleAction] = useActionState(loginWithGoogle, null)
+  const [, googleAction] = useActionState(loginWithGoogle, null)
 
   return (
     <div
