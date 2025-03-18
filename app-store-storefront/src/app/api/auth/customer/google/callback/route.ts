@@ -24,12 +24,15 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   return response.json()
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { countryCode: string } }
+) {
   try {
     const { searchParams } = new URL(request.url)
     const code = searchParams.get("code")
     const state = searchParams.get("state")
-    const countryCode = searchParams.get("countryCode") || "us"
+    const { countryCode } = params
 
     if (!code || !state) {
       return Response.json({ error: "Missing code or state" }, { status: 400 })
@@ -82,7 +85,6 @@ export async function GET(request: NextRequest) {
       if (customer) {
         await setAuthToken(token)
         revalidateTag("customer")
-
         return Response.redirect(
           new URL(`/${countryCode}/account`, request.url)
         )

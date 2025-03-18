@@ -248,34 +248,38 @@ export const updateCustomerAddress = async (
 }
 
 export const loginWithGoogle = async () => {
-  const result = await fetch(`${BACKEND_URL}/auth/customer/google`, {
-    credentials: "include",
-    method: "POST",
-  }).then((res) => res.json())
+  let result
+  try {
+    result = await sdk.auth.login("customer", "google", {})
+  } catch (error: any) {
+    return error.toString()
+  }
 
-  console.log(result)
-
-  if (result.location) {
+  if (typeof result === "object" && "location" in result) {
     // redirect to Google for authentication
     redirect(result.location)
   }
 
-  if (!result.token) {
+  if (typeof result === "string") {
     // result failed, show an error
-    console.log("Authentication failed")
     return
   }
 
   // authentication successful
   // use token in the authorization header of
   // all follow up requests. For example:
-  const { customer } = await fetch(`http://localhost:9000/store/customers/me`, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${result.token}`,
-      "x-publishable-api-key":
-        process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
-    },
-  }).then((res) => res.json())
+  // const { customer } = await fetch(`${BACKEND_URL}/store/customers/me`, {
+  //   credentials: "include",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: `Bearer ${result.token}`,
+  //     "x-publishable-api-key":
+  //       process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "temp",
+  //   },
+  // }).then((res) => res.json())
+
+  // console.log({ customer })
+
+  // await setAuthToken(result.token)
+  // revalidateTag("customer")
 }
